@@ -33,17 +33,17 @@ async function checkCourse(courseId) {
     
     try {
         //console.log(courseId);
-        const response = await fetch(`http://localhost:${coursePORT}/getCourseContentById/${courseId}`)
+        const response = await fetch(`const response = await fetch(`http://localhost:${coursePORT}/course/checkIfCourseExists/${courseId}`);
         const data = await response.json();
         
-        if(data && Object.keys(data).length < 1) {
-            console.log(data);
-            //console.log("Inside Function false");
-            return false;
-        } else {
+        if(data) {
             console.log(data);
             //console.log("Inside Function true");
-            return true;    
+            return true;
+        } else {
+            console.log(data);
+            //console.log("Inside Function false");
+            return false;    
         }
     }
     catch(error) {
