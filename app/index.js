@@ -33,7 +33,7 @@ async function checkCourse(courseId) {
     
     try {
         //console.log(courseId);
-        const response = await fetch(`const response = await fetch(`http://localhost:${coursePORT}/course/checkIfCourseExists/${courseId}`);
+        const response = await fetch(`http://localhost:${coursePORT}/course/checkIfCourseExists/${courseId}`);
         const data = await response.json();
         
         if(data) {
