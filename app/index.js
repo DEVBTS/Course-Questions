@@ -8,7 +8,7 @@ import swaggerUI from 'swagger-ui-express';
 
 const app = express();
 const PORT = process.env.PORT || 3000; // For app
-const coursePORT = 2020; // For getCourseById endpoint
+const coursePORT = 2020; // For getCourseContentById endpoint
 
 const swaggerOptions = {
     definition: {
@@ -418,7 +418,7 @@ app.put('/updateQuestion/:id',async (req, res) => {
 /**
  * @swagger
  * /checkAnswer:
- *  put:
+ *  post:
  *   summary: To answer the question
  *   description: To send the test taker's answer and check against the correct answer
  *   requestBody:
@@ -472,8 +472,8 @@ app.post('/checkAnswer', (req, res) => {
   
   const { questionId, ans } = req.body;
   
-  if( !questionId ) {
-      return res.status(400).send({ error: "Question ID is required." });
+  if( !questionId || !ans ) {
+      return res.status(400).send({ error: "Question ID and answer are required." });
   }
   
   const query = "SELECT question, ans FROM questions WHERE questionId = ?";
