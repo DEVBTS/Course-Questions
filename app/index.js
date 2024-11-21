@@ -33,7 +33,7 @@ async function checkCourse(courseId) {
     
     try {
         //console.log(courseId);
-        const response = await fetch(`http://localhost:${coursePORT}/getCourseById/${courseId}`)
+        const response = await fetch(`http://localhost:${coursePORT}/getCourseContentById/${courseId}`)
         const data = await response.json();
         
         if(data && Object.keys(data).length < 1) {
@@ -311,6 +311,82 @@ app.delete('/deleteQuestion/:id',(req, res) => {
     });    
 });
 
+/**
+ * @swagger
+ * /updateQuestion/{id}:
+ *  put:
+ *   summary: Update an existing question
+ *   description: Update an existing question for a course
+ *   parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema:
+ *       type: string
+ *      description: The Question ID
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       type: object
+ *       required:
+ *        - courseId
+ *        - question
+ *        - opt1
+ *        - opt2
+ *        - opt3
+ *        - opt4
+ *        - ans
+ *       properties:
+ *        courseId:
+ *         type: string
+ *         description: ID of the Course whose question is being updated
+ *         example: 1001
+ *        question:
+ *         type: string
+ *         description: Updated question for the course
+ *         example: What is 2 + 1 ?
+ *        opt1:
+ *         type: string
+ *         description: First option for the question
+ *         example: 3
+ *        opt2:
+ *         type: string
+ *         description: Second option for the question
+ *         example: 2
+ *        opt3:
+ *         type: string
+ *         description: Third option for the question
+ *         example: 1
+ *        opt4:
+ *         type: string
+ *         description: Fourth option for the question
+ *         example: 5
+ *        ans:
+ *         type: string
+ *         description: Correct answer for the question
+ *         example: 3
+ *   responses:
+ *    200:
+ *     description: Question updated in the database successfully.
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Question updated successfully.
+ *         questionId:
+ *          type: string
+ *          example: 1001
+ *    404:
+ *     description: No question found. Invalid question ID.
+ *    500:
+ *     description: Error updating question. 
+*/
+
 //Endpoint to update a question
 app.put('/updateQuestion/:id',async (req, res) => { 
     const questionId = req.params.id;
@@ -339,6 +415,58 @@ app.put('/updateQuestion/:id',async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /checkAnswer:
+ *  put:
+ *   summary: To answer the question
+ *   description: To send the test taker's answer and check against the correct answer
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       type: object
+ *       required:
+ *        - questionId
+ *        - ans
+ *       properties:
+ *        questionId:
+ *         type: string
+ *         description: ID of the question which is being answered
+ *         example: 1001
+ *        ans:
+ *         type: string
+ *         description: Tester's answer for the question
+ *         example: 3
+ *   responses:
+ *    200:
+ *     description: Response for the answer.
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         message:
+ *          type: string
+ *          example: Answer is correct/wrong.
+ *         question:
+ *          type: string
+ *          example: What is 1 + 1 ?
+ *         "Your Answer":
+ *          type: string
+ *          example: 2
+ *         "Correct Answer":
+ *          type: string
+ *          example: 2
+ *    400:
+ *     description: Question ID required
+ *    404:
+ *     description: No question found. Invalid question ID.
+ *    500:
+ *     description: Internal Server Error. 
+*/
+
 //Endpoint to check answer for the question
 app.post('/checkAnswer', (req, res) => {
   
@@ -361,12 +489,12 @@ app.post('/checkAnswer', (req, res) => {
       
       if(results.length > 0) {
           if(results[0].ans == ans) {
-              return res.send({ "message": "The answer is correct :)", "question": results[0].question, "answer": results[0].ans });
+              return res.status(200).send({ "message": "The answer is correct :)", "question": results[0].question, "Your Answer": ans, "Correct Answer": results[0].ans });
           } else {
-              return res.send({ "message": "The answer is wrong :( Try again.", "question": results[0].question, "Your answer": ans });
+              return res.status(200).send({ "message": "The answer is wrong.", "question": results[0].question, "Your Answer": ans, "Correct Answer": results[0].ans });
           }
       } else {
-          return res.send({ "message": "Question does not exist." });
+          return res.status(404).send({ "message": "Question does not exist." });
       }
       
   });
